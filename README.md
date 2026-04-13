@@ -12,6 +12,30 @@ Aplicação full-stack para gerenciamento de projetos com CRUD completo, filtros
 | Deploy backend | Render |
 | Deploy frontend | Vercel |
 
+## Arquitetura
+
+```
+┌─────────────────────────────────┐
+│   Vercel (Frontend)             │
+│   Astro + Svelte                │
+│   project-manager.vercel.app    │
+└────────────────┬────────────────┘
+                 │ HTTPS fetch /api/projects
+                 ▼
+┌─────────────────────────────────┐
+│   Render (Backend)              │
+│   Rails 8 API-only              │
+│   project-manager.onrender.com  │
+└────────────────┬────────────────┘
+                 │ TCP/SSL porta 6543
+                 ▼
+┌─────────────────────────────────┐
+│   Supabase (Banco de dados)     │
+│   PostgreSQL 16                 │
+│   Connection Pooler             │
+└─────────────────────────────────┘
+```
+
 ## Estrutura do repositório
 
 ```
@@ -103,22 +127,130 @@ npm run dev
 
 ## Endpoints da API
 
-| Método | Rota | Descrição |
-|---|---|---|
-| `GET` | `/up` | Health check |
-| `POST` | `/api/projects` | Criar projeto |
-| `GET` | `/api/projects` | Listar projetos |
-| `GET` | `/api/projects/:id` | Buscar projeto |
-| `PATCH` | `/api/projects/:id` | Atualizar projeto |
-| `DELETE` | `/api/projects/:id` | Remover projeto |
+### `GET /up`
 
-### Query params em `GET /api/projects`
+Health check. Retorna `200 OK` se o servidor está no ar.
+
+---
+
+### `GET /api/projects`
+
+Lista todos os projetos. Suporta filtragem e ordenação via query params.
+
+**Query params:**
 
 | Param | Tipo | Descrição |
 |---|---|---|
-| `search` | string | Busca por nome (ILIKE, mín. 3 chars) |
-| `favorite` | `"true"` | Apenas favoritos |
-| `orderBy` | `alpha` \| `recent` \| `deadline` | Ordenação |
+| `search` | `string` | Busca por nome (ILIKE, mín. 3 caracteres) |
+| `favorite` | `"true"` | Retorna apenas projetos favoritados |
+| `orderBy` | `"alpha"` \| `"recent"` \| `"deadline"` | Critério de ordenação |
+
+**Ordenação:**
+
+| Valor | Critério |
+|---|---|
+| `alpha` | Ordem alfabética por nome (padrão) |
+| `recent` | Data de início mais recente primeiro |
+| `deadline` | Prazo mais próximo primeiro |
+
+**Resposta `200`:**
+```json
+[
+  {
+    "id": "uuid",
+    "name": "Nome do Projeto",
+    "client": "Cliente",
+    "startDate": "2024-01-01",
+    "endDate": "2024-12-31",
+    "coverImage": null,
+    "isFavorite": false,
+    "createdAt": "2024-01-01T00:00:00.000Z",
+    "updatedAt": "2024-01-01T00:00:00.000Z"
+  }
+]
+```
+
+---
+
+### `GET /api/projects/:id`
+
+Retorna um projeto pelo ID.
+
+**Resposta `200`:** mesmo shape do item acima.
+
+**Resposta `404`:**
+```json
+{ "error": "Projeto não encontrado" }
+```
+
+---
+
+### `POST /api/projects`
+
+Cria um novo projeto.
+
+**Body:**
+```json
+{
+  "name": "Nome do Projeto",
+  "client": "Cliente",
+  "startDate": "2024-01-01",
+  "endDate": "2024-12-31",
+  "coverImage": null,
+  "isFavorite": false
+}
+```
+
+**Validações:**
+
+| Campo | Regra |
+|---|---|
+| `name` | Obrigatório, mínimo 2 palavras |
+| `client` | Obrigatório |
+| `startDate` | Obrigatório, formato `YYYY-MM-DD` |
+| `endDate` | Obrigatório, formato `YYYY-MM-DD`, deve ser maior que `startDate` |
+| `coverImage` | Opcional, base64 ou `null` |
+| `isFavorite` | Opcional, boolean, padrão `false` |
+
+**Resposta `201`:** projeto criado com todos os campos.
+
+**Resposta `422`:**
+```json
+{
+  "errors": [
+    { "field": "name", "message": "deve conter ao menos 2 palavras" },
+    { "field": "endDate", "message": "deve ser maior que a data inicial" }
+  ]
+}
+```
+
+---
+
+### `PATCH /api/projects/:id`
+
+Atualiza parcialmente um projeto. Aceita qualquer subconjunto dos campos do body do `POST`.
+
+**Resposta `200`:** projeto atualizado com todos os campos.
+
+**Resposta `404`:**
+```json
+{ "error": "Projeto não encontrado" }
+```
+
+---
+
+### `DELETE /api/projects/:id`
+
+Remove um projeto.
+
+**Resposta `204`:** sem body.
+
+**Resposta `404`:**
+```json
+{ "error": "Projeto não encontrado" }
+```
+
+---
 
 ## Deploy
 
@@ -126,7 +258,7 @@ npm run dev
 |---|---|---|
 | Frontend | Vercel | Variável `PUBLIC_API_URL` apontando para o backend |
 | Backend | Render | Variável `CORS_ORIGINS` com o domínio do Vercel |
-| Banco | Supabase | `DATABASE_URL` configurada no Render |
+| Banco | Supabase | `DATABASE_URL` configurada no Render via connection pooler (porta 6543) |
 
 ## Decisões técnicas
 
@@ -143,3 +275,5 @@ npm run dev
 **Histórico de busca em localStorage** — Client-side, sem necessidade de backend ou autenticação.
 
 **Estado dos filtros na URL** — `searchParams` permitem bookmarking e compartilhamento da listagem filtrada.
+
+**Connection Pooler no Supabase** — Utilizado o Transaction Pooler (porta 6543) em vez da conexão direta (porta 5432) para compatibilidade com a infraestrutura IPv4 do Render.
