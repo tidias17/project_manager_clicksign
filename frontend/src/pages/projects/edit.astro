@@ -1,0 +1,16 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import ProjectEditForm from '../../components/ProjectEditForm.svelte';
+import arrowLeftIcon from '../../assets/icons/arrow-left.svg?url';
+---
+
+<Layout title="Editar Projeto — Gerenciador de Projetos">
+  <div class="mb-2">
+    <a href="/" class="text-base text-brand hover:underline flex items-center gap-2">
+      <img src={arrowLeftIcon} alt="Voltar" class="w-4 h-4" />
+      Voltar
+    </a>
+  </div>
+   <h1 class="text-2xl font-semibold text-empty-title mb-8">Editar projeto</h1>
+  <ProjectEditForm client:load />
+</Layout>

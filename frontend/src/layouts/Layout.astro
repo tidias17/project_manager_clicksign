@@ -1,0 +1,46 @@
+---
+import '../styles/global.css';
+import logoSrc from '../assets/logo.svg?url';
+import SearchBar from '../components/SearchBar.svelte';
+
+export interface Props {
+  title?: string;
+}
+
+const { title = 'Gerenciador de Projetos' } = Astro.props;
+const isHome = Astro.url.pathname === '/';
+---
+
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{title}</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  </head>
+  <body class="min-h-screen bg-empty-bg">
+    <header class="bg-header-bg border-b border-header-border shadow-header sticky top-0 z-10">
+      <div class="flex items-center h-20 px-[60px]">
+        <!-- Left spacer -->
+        <div class="flex-1"></div>
+
+        <!-- Center logo -->
+        <a href="/">
+          <img src={logoSrc} width="193" height="72" alt="Gerenciador de Projetos" />
+        </a>
+
+        <!-- Right: search (only on home) -->
+        <div class="flex-1 flex justify-end">
+          {isHome && <SearchBar client:load />}
+        </div>
+      </div>
+    </header>
+
+    <main class="px-[40px] py-[40px]">
+      <slot />
+    </main>
+  </body>
+</html>
