@@ -122,7 +122,7 @@
       <p class="text-red-500 text-sm">{error}</p>
     </div>
   {:else if !hasAnyProjects}
-    <div class="text-center bg-empty-content flex min-h-[calc(100vh-164px)] flex-col items-center justify-center">
+    <div class="text-center bg-empty-content flex min-h-[calc(100vh-164px)] rounded-sm flex-col items-center justify-center">
       <h2 class="w-full ext-lg font-semibold text-[24px] text-empty-title leading-[100%]">
         {searchTerm.length >= 3 ? 'Nenhum projeto encontrado' : 'Nenhum projeto'}
       </h2>
