@@ -25,6 +25,21 @@
   const hasTwoWords = (v: string) => v.trim().split(/\s+/).filter(Boolean).length >= 2;
   const isValidDate = (v: string) => /^\d{4}-\d{2}-\d{2}$/.test(v);
 
+  function limitYear(e: Event) {
+    const input = e.target as HTMLInputElement;
+    if (!input.value) return;
+    const [y, m, d] = input.value.split('-');
+    if (y && y.length > 4) {
+      input.value = [y.slice(0, 4), m, d].filter(Boolean).join('-');
+    }
+  }
+
+  function clearError(...fields: string[]) {
+    const e = { ...errors };
+    fields.forEach((f) => delete e[f]);
+    errors = e;
+  }
+
   function validateNameField() {
     const e = { ...errors };
     if (!name.trim()) e.name = 'Nome é obrigatório';
@@ -40,16 +55,22 @@
     errors = e;
   }
 
-  function validateDateFields() {
+  function validateStartDate() {
     const e = { ...errors };
-    if (!startDate) e.startDate = 'Selecione uma data válida';
-    else if (!isValidDate(startDate)) e.startDate = 'Selecione uma data válida';
+    if (!startDate || !isValidDate(startDate)) e.startDate = 'Selecione uma data válida';
     else delete e.startDate;
+    if (isValidDate(startDate) && isValidDate(endDate) && endDate <= startDate) {
+      e.endDate = 'A data final deve ser maior que a data inicial';
+    } else if (isValidDate(endDate)) {
+      delete e.endDate;
+    }
+    errors = e;
+  }
 
-    if (!endDate) e.endDate = 'Selecione uma data válida';
-    else if (!isValidDate(endDate)) e.endDate = 'Selecione uma data válida';
+  function validateEndDate() {
+    const e = { ...errors };
+    if (!endDate || !isValidDate(endDate)) e.endDate = 'Selecione uma data válida';
     else delete e.endDate;
-
     if (isValidDate(startDate) && isValidDate(endDate) && endDate <= startDate) {
       e.endDate = 'A data final deve ser maior que a data inicial';
     }
@@ -61,13 +82,9 @@
     if (!name.trim()) e.name = 'Nome é obrigatório';
     else if (!hasTwoWords(name)) e.name = 'Por favor, digite ao menos duas palavras';
     if (!client.trim()) e.client = 'Por favor, digite ao menos uma palavra';
-    if (!startDate) e.startDate = 'Selecione uma data válida';
-    else if (!isValidDate(startDate)) e.startDate = 'Selecione uma data válida';
-    if (!endDate) e.endDate = 'Selecione uma data válida';
-    else if (!isValidDate(endDate)) e.endDate = 'Selecione uma data válida';
-    if (isValidDate(startDate) && isValidDate(endDate) && endDate <= startDate) {
-      e.endDate = 'A data final deve ser maior que a data inicial';
-    }
+    if (!startDate || !isValidDate(startDate)) e.startDate = 'Selecione uma data válida';
+    if (!endDate || !isValidDate(endDate)) e.endDate = 'Selecione uma data válida';
+    else if (isValidDate(startDate) && endDate <= startDate) e.endDate = 'A data final deve ser maior que a data inicial';
     errors = e;
     return Object.keys(e).length === 0;
   }
@@ -127,6 +144,7 @@
         id="name"
         type="text"
         bind:value={name}
+        oninput={() => errors.name && clearError('name')}
         onblur={validateNameField}
         class="w-full px-4 h-[40px] py-0 rounded-lg border {errors.name ? 'border-form-error text-form-error' : 'border-main-muted'} text-sm outline-none focus:ring-2 focus:ring-brand/30 focus:border-brand"
       />
@@ -141,6 +159,7 @@
         id="client"
         type="text"
         bind:value={client}
+        oninput={() => errors.client && clearError('client')}
         onblur={validateClientField}
         class="w-full px-4 h-[40px] py-0 rounded-lg border {errors.client ? 'border-form-error text-form-error' : 'border-main-muted'} text-sm outline-none focus:ring-2 focus:ring-brand/30 focus:border-brand"
       />
@@ -158,7 +177,8 @@
             type={startDateType}
             bind:value={startDate}
             onfocus={() => { startDateType = 'date'; }}
-            onblur={() => { if (!startDate) startDateType = 'text'; validateDateFields(); }}
+            oninput={(e) => { limitYear(e); (errors.startDate || errors.endDate) && clearError('startDate', 'endDate'); }}
+            onblur={() => { if (!startDate) startDateType = 'text'; validateStartDate(); }}
             class="w-full px-4 h-[40px] py-0 pr-10 rounded-sm border {errors.startDate ? 'border-form-error text-form-error' : 'border-main-muted'} text-sm outline-none focus:ring-2 focus:ring-brand/30 focus:border-brand [&::-webkit-calendar-picker-indicator]:opacity-0 [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:right-0 [&::-webkit-calendar-picker-indicator]:w-10 [&::-webkit-calendar-picker-indicator]:h-full [&::-webkit-calendar-picker-indicator]:cursor-pointer"
           />
           <img src={calendarDayIcon} alt="" class="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 w-6 h-6 {errors.startDate ? 'brightness-0 saturate-100 [filter:invert(20%)_sepia(90%)_saturate(700%)_hue-rotate(340deg)]' : ''}" />
@@ -175,7 +195,8 @@
             type={endDateType}
             bind:value={endDate}
             onfocus={() => { endDateType = 'date'; }}
-            onblur={() => { if (!endDate) endDateType = 'text'; validateDateFields(); }}
+            oninput={(e) => { limitYear(e); (errors.startDate || errors.endDate) && clearError('startDate', 'endDate'); }}
+            onblur={() => { if (!endDate) endDateType = 'text'; validateEndDate(); }}
             class="w-full px-4 h-[40px] py-0 pr-10 rounded-sm border {errors.endDate ? 'border-form-error text-form-error' : 'border-main-muted'} text-sm outline-none focus:ring-2 focus:ring-brand/30 focus:border-brand [&::-webkit-calendar-picker-indicator]:opacity-0 [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:right-0 [&::-webkit-calendar-picker-indicator]:w-10 [&::-webkit-calendar-picker-indicator]:h-full [&::-webkit-calendar-picker-indicator]:cursor-pointer"
           />
           <img src={calendarCheckIcon} alt="" class="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 w-6 h-6 {errors.endDate ? 'brightness-0 saturate-100 [filter:invert(20%)_sepia(90%)_saturate(700%)_hue-rotate(340deg)]' : ''}" />
