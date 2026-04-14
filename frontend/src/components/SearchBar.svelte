@@ -137,8 +137,8 @@
     onkeydown={() => {}}
   ></div>
 
-  <div class="fixed left-0 right-0 top-0 z-50 bg-white border-2 border-brand rounded-[16px]" style="box-shadow: 0px 4px 4px 0px #00000040;">
-      <div class="flex items-center gap-4 px-6 py-4">
+  <div class="fixed left-0 right-0 top-0 z-50 bg-white {history.length > 0 ? 'border-2 border-brand rounded-[16px]' : 'border-b border-[color:var(--color-border)]'}" style="box-shadow: 0px 4px 4px 0px #00000040;">
+    <div class="flex items-center gap-4 px-6 h-[80px]">
       <img src={searchInnerIcon} alt="Buscar" class="w-5 h-5 shrink-0" />
       <input
         bind:this={inputRef}
