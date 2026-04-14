@@ -134,8 +134,8 @@
   function removeCover() { coverImage = null; }
 </script>
 
-<section class="w-full flex justify-center border border-[color:var(--color-border)] rounded-lg py-[52px]">
-  <form onsubmit={handleSubmit} class="space-y-6 max-w-[702px] w-full">
+<section class="w-full flex justify-center border border-[color:var(--color-border)] rounded-lg py-8 sm:py-[52px]">
+  <form onsubmit={handleSubmit} class="space-y-6 max-w-[702px] w-full px-4 sm:px-0">
     <div>
       <label class="block text-sm font-medium mb-1 {errors.name ? 'text-form-error-bold' : 'text-brand'}" for="name">
         Nome do projeto <span class="text-sm font-normal {errors.name ? 'text-form-error' : 'text-empty-text'}">(Obrigatório)</span>
@@ -166,7 +166,7 @@
       {#if errors.client}<p class="mt-1 text-sm text-form-error">{errors.client}</p>{/if}
     </div>
 
-    <div class="grid grid-cols-2 gap-4">
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
       <div>
         <label class="block text-sm font-medium mb-1 {errors.startDate ? 'text-form-error-bold' : 'text-brand'}" for="startDate">
           Data de Início <span class="text-sm font-normal {errors.startDate ? 'text-form-error' : 'text-empty-text'}">(Obrigatório)</span>

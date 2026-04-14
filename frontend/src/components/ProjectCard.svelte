@@ -51,7 +51,7 @@
     onkeydown={(e) => e.key === 'Escape' && (confirmDelete = false)}
   >
     <div
-      class="relative bg-white rounded-lg pt-12 pb-8 px-8 w-[582px] h-[321px] shadow-xl text-center"
+      class="relative bg-white rounded-lg pt-12 pb-8 px-6 sm:px-8 w-[calc(100%-32px)] sm:w-[582px] shadow-xl text-center"
       role="dialog"
       aria-modal="true"
       aria-labelledby="delete-dialog-title"
@@ -64,16 +64,16 @@
       <h2 id="delete-dialog-title" class="text-2xl font-semibold text-main-title mb-3">Remover projeto</h2>
       <hr class="border-[color:var(--color-divider)] mt-6 mb-8" />
       <p class="text-base text-[color:var(--color-main-muted)] mb-3">Essa ação removerá definitivamente o projeto:</p>
-      <p class="text-2xl font-medium text-[color:var(--color-header-bg)] mb-8">{project.name}</p>
-      <div class="flex gap-4">
+      <p class="text-xl sm:text-2xl font-medium text-[color:var(--color-header-bg)] mb-8 truncate">{project.name}</p>
+      <div class="flex gap-3 sm:gap-4">
         <button
-          class="h-[52px] w-[226px] rounded-full border border-brand text-xl text-brand hover:bg-gray-50 transition-colors"
+          class="h-[40px] sm:h-[52px] flex-1 sm:flex-none sm:w-[226px] rounded-full border border-brand text-base sm:text-xl text-brand hover:bg-gray-50 transition-colors"
           onclick={() => (confirmDelete = false)}
         >
           Cancelar
         </button>
         <button
-          class="h-[52px] w-[260px] rounded-full bg-brand text-white text-xl hover:bg-brand-dark transition-colors"
+          class="h-[40px] sm:h-[52px] flex-1 sm:flex-none sm:w-[260px] rounded-full bg-brand text-white text-base sm:text-xl hover:bg-brand-dark transition-colors"
           onclick={async () => {
             await api.deleteProject(project.id);
             confirmDelete = false;
@@ -87,7 +87,7 @@
   </div>
 {/if}
 
-<div class="bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100 hover:shadow-md transition-shadow w-[346px] h-[430px] flex flex-col">
+<div class="bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100 hover:shadow-md transition-shadow w-full sm:w-[346px] h-[430px] flex flex-col">
   <div class="relative h-[232px] shrink-0">
     <img src={project.coverImage ?? defaultProjectImage} alt={project.name} class="w-full h-full object-cover" />
 

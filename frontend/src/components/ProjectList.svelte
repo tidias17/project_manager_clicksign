@@ -106,7 +106,7 @@
   {/if}
 
   {#if loading}
-    <div class="grid gap-[32px] [grid-template-columns:repeat(auto-fill,346px)]">
+    <div class="grid gap-[32px] grid-cols-1 sm:[grid-template-columns:repeat(auto-fill,346px)]">
       {#each Array(4) as _}
         <div class="bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100 animate-pulse">
           <div class="h-40 bg-gray-200"></div>
@@ -149,7 +149,7 @@
         {/if}
       </h1>
 
-      <div class="flex items-center gap-3 flex-wrap">
+      <div class="flex flex-col sm:flex-row sm:items-center gap-3 w-full sm:w-auto">
         <label class="flex items-center gap-2 cursor-pointer select-none">
           <input
             type="checkbox"
@@ -167,14 +167,14 @@
           <span class="text-base text-gray-600">Apenas Favoritos</span>
         </label>
 
-        <div class="relative ml-8">
+        <div class="relative sm:ml-8 w-full sm:w-auto">
           {#if orderDropdownOpen}
             <div class="fixed inset-0 z-10" onclick={() => (orderDropdownOpen = false)} onkeydown={() => {}}></div>
           {/if}
           <button
             type="button"
             onclick={() => (orderDropdownOpen = !orderDropdownOpen)}
-            class="h-[40px] w-[296px] flex items-center justify-between pl-4 pr-3 text-base border rounded-lg cursor-pointer bg-white text-header-bg transition-colors
+            class="h-[40px] w-full sm:w-[296px] flex items-center justify-between pl-4 pr-3 text-base border rounded-lg cursor-pointer bg-white text-header-bg transition-colors
               {orderDropdownOpen ? 'border-brand rounded-t-lg rounded-b-none' : 'border-main-muted'}"
           >
             <span>{orderOptions.find(o => o.value === orderBy)?.label}</span>
@@ -182,7 +182,7 @@
           </button>
 
           {#if orderDropdownOpen}
-            <div class="absolute left-0 top-[39px] w-[296px] bg-white border border-brand rounded-b-2xl z-20 overflow-hidden shadow-sm">
+            <div class="absolute left-0 top-[39px] w-full sm:w-[296px] bg-white border border-brand rounded-b-2xl z-20 overflow-hidden shadow-sm">
               {#each orderOptions as option}
                 <button
                   type="button"
@@ -198,7 +198,7 @@
 
         <a
           href="/projects/new"
-          class="h-[40px] w-[184px] flex items-center justify-center gap-2 px-5 bg-brand text-white text-base font-normal rounded-full hover:bg-brand-dark transition-colors ml-8"
+          class="h-[40px] w-full sm:w-[184px] flex items-center justify-center gap-2 px-5 bg-brand text-white text-base font-normal rounded-full hover:bg-brand-dark transition-colors sm:ml-8"
         >
           <img src={plusCircleIcon} alt="Novo projeto" class="w-6 h-6 shrink-0" />
           Novo projeto
@@ -209,7 +209,7 @@
     {#if projects.length === 0}
       <p class="text-center text-gray-500 mt-16">Nenhum projeto corresponde aos filtros aplicados.</p>
     {:else}
-      <div class="grid gap-[32px] [grid-template-columns:repeat(auto-fill,346px)]">
+      <div class="grid gap-[32px] grid-cols-1 sm:[grid-template-columns:repeat(auto-fill,346px)]">
         {#each projects as project (project.id)}
           <ProjectCard
             {project}
